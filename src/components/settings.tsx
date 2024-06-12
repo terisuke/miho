@@ -651,9 +651,9 @@ export const Settings = ({
                 <div className="my-8">
                   {t('ConversationHistoryInfo')}
                 </div>
-                <TextButton onClick={() => { 
+                <TextButton onClick={() => {
                   onClickResetChatLog();
-                  onClickResetCodeLog(); 
+                  onClickResetCodeLog();
                 }}>
                   {t('ConversationHistoryReset')}
                 </TextButton>
@@ -689,3 +689,4 @@ export const Settings = ({
     </div>
   );
 };
+

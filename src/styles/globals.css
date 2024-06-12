@@ -18,10 +18,12 @@ body {
     width: 100%;
     border-radius: 4px;
   }
+
   .input-range:focus,
   .input-range:active {
     outline: none;
   }
+
   .input-range::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
@@ -45,5 +47,10 @@ body {
 
   .scroll-hidden::-webkit-scrollbar {
     display: none;
+  }
+
+  .break-words {
+    word-break: break-word;
+    overflow-wrap: break-word;
   }
 }
