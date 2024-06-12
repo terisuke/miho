@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { IconButton } from "./iconButton";
 import { TextButton } from "./textButton";
 import { Message } from "@/features/messages/messages";
@@ -13,6 +13,8 @@ import { Link } from "./link";
 import i18n from "i18next";
 import { useTranslation } from 'react-i18next';
 import speakers from './speakers.json';
+import { buildUrl } from "@/utils/buildUrl";
+import { ViewerContext } from "@/features/vrmViewer/viewerContext";
 
 type Props = {
   selectAIService: string;
@@ -68,7 +70,10 @@ type Props = {
   setSelectLanguage: (show: string) => void;
   setSelectVoiceLanguage: (show: string) => void;
   onClickTestVoice: (speaker: string) => void;
+  selectVrmModel: string;
+  setSelectVrmModel: (model: string) => void;
 };
+
 export const Settings = ({
   selectAIService,
   setSelectAIService,
@@ -122,12 +127,20 @@ export const Settings = ({
   setSelectLanguage,
   setSelectVoiceLanguage,
   onClickTestVoice,
+  selectVrmModel,
+  setSelectVrmModel,
 }: Props) => {
   const { t } = useTranslation();
+  const { viewer } = useContext(ViewerContext);
 
-  // オブジェクトを定義して、各AIサービスのデフォルトモデルを保存する
-  // ollamaが選択された場合、AIモデルを空文字に設定
-  const defaultModels = {
+  const handleVrmChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const vrmFile = event.target.value;
+    setSelectVrmModel(vrmFile); // 選択したモデルを状態に保存
+    viewer.loadVrm(buildUrl(vrmFile)); // 選択したモデルを読み込む
+  };
+
+  // AIサービスごとのデフォルトモデルを設定
+  const defaultModels: { [key: string]: string } = {
     openai: 'gpt-3.5-turbo',
     anthropic: 'claude-3-haiku-20240307',
     groq: 'gemma-7b-it',
@@ -165,7 +178,7 @@ export const Settings = ({
                       break;
                     case "EN":
                       setSelectLanguage("EN");
-                      if (selectVoice === "voicevox" || selectVoice === "koeiromap") {
+                      if (selectVoice === "voicevox") {
                         setSelectVoice("google");
                       }
                       setSelectVoiceLanguage("en-US");
@@ -173,7 +186,7 @@ export const Settings = ({
                       break;
                     case "ZH":
                       setSelectLanguage("ZH");
-                      if (selectVoice === "voicevox" || selectVoice === "koeiromap") {
+                      if (selectVoice === "voicevox") {
                         setSelectVoice("google");
                       }
                       setSelectVoiceLanguage("zh-TW");
@@ -215,12 +228,12 @@ export const Settings = ({
                       {t('SelectAIService')}
                     </div>
                     <div className="my-8">
-                    <select
+                      <select
                         className="px-16 py-8 bg-surface1 hover:bg-surface1-hover rounded-8"
                         value={selectAIService}
                         onChange={(e) => {
                           const newService = e.target.value as keyof typeof defaultModels;
-                          setSelectAIService(newService);
+                          setSelectAIService(String(newService));
                           // 選択したAIサービスに基づいてデフォルトモデルを設定する
                           setSelectAIModel(defaultModels[newService]);
                         }}
@@ -231,7 +244,7 @@ export const Settings = ({
                         <option value="ollama">{t('LocalLLMOllama')}</option>
                         <option value="dify">Dify</option>
                       </select>
-                      </div>
+                    </div>
                     {(() => {
                       if (selectAIService === "openai") {
                         return (
@@ -424,7 +437,15 @@ export const Settings = ({
               {t('CharacterModelLabel')}
             </div>
             <div className="my-8">
-              <TextButton onClick={onClickOpenVrmFile}>{t('OpenVRM')}</TextButton>
+              <select
+                className="px-16 py-8 bg-surface1 hover:bg-surface1-hover rounded-8"
+                value={selectVrmModel} // 現在の選択を保持する
+                onChange={handleVrmChange}
+              >
+                <option value="/AvatarSample_A.vrm">女の子</option>
+                <option value="/AvatarSample_C.vrm">男の子</option>
+                <option value="/inuinu.vrm">わんこ</option>
+              </select>
             </div>
           </div>
           {(() => {
@@ -689,4 +710,3 @@ export const Settings = ({
     </div>
   );
 };
-

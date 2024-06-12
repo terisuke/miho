@@ -56,6 +56,9 @@ export default function Home() {
   const { t } = useTranslation();
   const INTERVAL_MILL_SECONDS_RETRIEVING_COMMENTS = 20000; // 20秒
 
+  // VRMモデル選択用のステートを追加
+  const [selectVrmModel, setSelectVrmModel] = useState('/AvatarSample_A.vrm');
+
   useEffect(() => {
     const storedData = window.localStorage.getItem("chatVRMParams");
     if (storedData) {
@@ -84,6 +87,7 @@ export default function Home() {
       setStylebertvits2ServerURL(params.stylebertvits2ServerUrl || "http://127.0.0.1:5000");
       setStylebertvits2ModelId(params.stylebertvits2ModelId || "0");
       setStylebertvits2Style(params.stylebertvits2Style || "Neutral");
+      setSelectVrmModel(params.selectVrmModel || "/AvatarSample_A.vrm"); // 追加
     }
   }, []);
 
@@ -112,7 +116,8 @@ export default function Home() {
       webSocketMode,
       stylebertvits2ServerUrl,
       stylebertvits2ModelId,
-      stylebertvits2Style
+      stylebertvits2Style,
+      selectVrmModel, // 追加
     };
     process.nextTick(() =>
       window.localStorage.setItem(
@@ -143,7 +148,8 @@ export default function Home() {
     webSocketMode,
     stylebertvits2ServerUrl,
     stylebertvits2ModelId,
-    stylebertvits2Style
+    stylebertvits2Style,
+    selectVrmModel // 追加
   ]);
 
   const handleChangeChatLog = useCallback(
@@ -540,6 +546,8 @@ export default function Home() {
         selectLanguage={selectLanguage}
         setSelectLanguage={setSelectLanguage}
         setSelectVoiceLanguage={setSelectVoiceLanguage}
+        selectVrmModel={selectVrmModel} // 追加
+        setSelectVrmModel={setSelectVrmModel} // 追加
       />
       <GitHubLink />
     </div>

@@ -1,9 +1,9 @@
+import React, { useState, useCallback, useContext, useRef } from "react";
 import { IconButton } from "./iconButton";
 import { Message } from "@/features/messages/messages";
 import { KoeiroParam } from "@/features/constants/koeiroParam";
 import { ChatLog } from "./chatLog";
 import { CodeLog } from "./codeLog";
-import React, { useCallback, useContext, useRef, useState } from "react";
 import { Settings } from "./settings";
 import { ViewerContext } from "@/features/vrmViewer/viewerContext";
 import { AssistantText } from "./assistantText";
@@ -62,7 +62,10 @@ type Props = {
   selectLanguage: string;
   setSelectLanguage: (show: string) => void;
   setSelectVoiceLanguage: (show: string) => void;
+  selectVrmModel: string;
+  setSelectVrmModel: (model: string) => void;
 };
+
 export const Menu = ({
   selectAIService,
   setSelectAIService,
@@ -121,6 +124,9 @@ export const Menu = ({
   const { viewer } = useContext(ViewerContext);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { t } = useTranslation();
+
+  // VRMモデル選択用のステートを追加
+  const [selectVrmModel, setSelectVrmModel] = useState('/AvatarSample_A.vrm');
 
   const handleChangeSystemPrompt = useCallback(
     (event: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -296,7 +302,7 @@ export const Menu = ({
         </div>
       </div>
       {
-        webSocketMode ? 
+        webSocketMode ?
           (showChatLog && <CodeLog messages={codeLog} />) :
           (showChatLog && <ChatLog messages={chatLog} />)
       }
@@ -355,6 +361,8 @@ export const Menu = ({
           setSelectLanguage = {setSelectLanguage}
           setSelectVoiceLanguage = {setSelectVoiceLanguage}
           onClickTestVoice={handleClickTestVoice}
+          selectVrmModel={selectVrmModel}
+          setSelectVrmModel={setSelectVrmModel}
         />
       )}
       {!showChatLog && assistantMessage && (
