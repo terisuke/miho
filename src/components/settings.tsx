@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import speakers from './speakers.json';
 import { buildUrl } from "@/utils/buildUrl";
 import { ViewerContext } from "@/features/vrmViewer/viewerContext";
+import { PROMPTS } from "@/features/constants/systemPromptConstants";
 
 type Props = {
   selectAIService: string;
@@ -37,6 +38,7 @@ type Props = {
   koeiroParam: KoeiroParam;
   koeiromapKey: string;
   voicevoxSpeaker: string;
+  setVoicevoxSpeaker: (speaker: string) => void;
   googleTtsType: string;
   stylebertvits2ServerUrl: string;
   stylebertvits2ModelId: string;
@@ -94,6 +96,7 @@ export const Settings = ({
   koeiroParam,
   koeiromapKey,
   voicevoxSpeaker,
+  setVoicevoxSpeaker,
   googleTtsType,
   stylebertvits2ServerUrl,
   stylebertvits2ModelId,
@@ -106,7 +109,6 @@ export const Settings = ({
   onChangeChatLog,
   onChangeCodeLog,
   onChangeKoeiroParam,
-  onClickOpenVrmFile,
   onClickResetChatLog,
   onClickResetCodeLog,
   onClickResetSystemPrompt,
@@ -137,6 +139,37 @@ export const Settings = ({
     const vrmFile = event.target.value;
     setSelectVrmModel(vrmFile); // 選択したモデルを状態に保存
     viewer.loadVrm(buildUrl(vrmFile)); // 選択したモデルを読み込む
+
+    // VRMモデルに応じてスピーカーとシステムプロンプトを変更
+    let speakerId; // スピーカーIDを初期化
+    let systemPrompt;
+    switch (vrmFile) {
+      case '/AvatarSample_A.vrm':
+        speakerId = 2; // 四国めたん/普通のID
+        systemPrompt = PROMPTS.avatarSampleA;
+        break;
+      case '/AvatarSample_C.vrm':
+        speakerId = 12; // 白上虎太郎/普通のID
+        systemPrompt = PROMPTS.avatarSampleC;
+        break;
+      case '/inuinu.vrm':
+        speakerId = 3; // ずんだもん/普通のID
+        systemPrompt = PROMPTS.inuinu;
+        break;
+      default:
+        speakerId = 2; // 四国めたん/普通のID
+        systemPrompt = PROMPTS.avatarSampleA;
+        break;
+    }
+
+    // スピーカーIDに対応するスピーカー名を設定
+    const speaker = speakers.find(s => s.id === speakerId);
+    if (speaker) {
+      setVoicevoxSpeaker(speaker.speaker); // スピーカー名を設定
+    }
+
+    // システムプロンプトを設定
+    onChangeSystemPrompt({ target: { value: systemPrompt } } as React.ChangeEvent<HTMLTextAreaElement>);
   };
 
   // AIサービスごとのデフォルトモデルを設定
@@ -442,9 +475,9 @@ export const Settings = ({
                 value={selectVrmModel} // 現在の選択を保持する
                 onChange={handleVrmChange}
               >
-                <option value="/AvatarSample_A.vrm">女の子</option>
-                <option value="/AvatarSample_C.vrm">男の子</option>
-                <option value="/inuinu.vrm">わんこ</option>
+                <option value="/AvatarSample_A.vrm">Miho</option>
+                <option value="/AvatarSample_C.vrm">Kennichi</option>
+                <option value="/inuinu.vrm">Mugi</option>
               </select>
             </div>
           </div>
@@ -584,7 +617,7 @@ export const Settings = ({
                           >
                             <option value="">選択してください</option>
                             {speakers.map((speaker) => (
-                              <option key={speaker.id} value={speaker.id}>
+                              <option key={speaker.id} value={speaker.speaker}>
                                 {speaker.speaker}
                               </option>
                             ))}

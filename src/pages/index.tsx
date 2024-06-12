@@ -516,6 +516,7 @@ export default function Home() {
         assistantMessage={assistantMessage}
         koeiromapKey={koeiromapKey}
         voicevoxSpeaker={voicevoxSpeaker}
+        setVoicevoxSpeaker={setVoicevoxSpeaker}
         googleTtsType={googleTtsType}
         stylebertvits2ServerUrl={stylebertvits2ServerUrl}
         stylebertvits2ModelId={stylebertvits2ModelId}

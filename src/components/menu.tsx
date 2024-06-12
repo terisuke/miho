@@ -32,6 +32,7 @@ type Props = {
   assistantMessage: string;
   koeiromapKey: string;
   voicevoxSpeaker: string;
+  setVoicevoxSpeaker: (speaker: string) => void;
   googleTtsType: string;
   stylebertvits2ServerUrl: string;
   onChangeStyleBertVits2ServerUrl: (key: string) => void;
@@ -88,6 +89,7 @@ export const Menu = ({
   assistantMessage,
   koeiromapKey,
   voicevoxSpeaker,
+  setVoicevoxSpeaker,
   googleTtsType,
   stylebertvits2ServerUrl,
   stylebertvits2ModelId,
@@ -328,6 +330,7 @@ export const Menu = ({
           koeiroParam={koeiroParam}
           koeiromapKey={koeiromapKey}
           voicevoxSpeaker={voicevoxSpeaker}
+          setVoicevoxSpeaker={setVoicevoxSpeaker}
           googleTtsType={googleTtsType}
           stylebertvits2ServerUrl={stylebertvits2ServerUrl}
           stylebertvits2ModelId={stylebertvits2ModelId}
