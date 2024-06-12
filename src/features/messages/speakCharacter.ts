@@ -5,6 +5,7 @@ import { synthesizeStyleBertVITS2Api } from "./synthesizeStyleBertVITS2";
 import { Viewer } from "../vrmViewer/viewer";
 import { Screenplay } from "./messages";
 import { Talk } from "./messages";
+import speakers from "src/components/speakers.json";
 
 const VOICE_VOX_API_URL = process.env.NEXT_PUBLIC_VOICE_VOX_API_URL || 'http://localhost:50021';
 
@@ -98,8 +99,17 @@ export const fetchAudioVoiceVox = async (
   talk: Talk,
   speaker: string
 ): Promise<ArrayBuffer> => {
-  console.log("speakerId:", speaker)
-  const ttsQueryResponse = await fetch(VOICE_VOX_API_URL + '/audio_query?speaker=' + speaker + '&text=' + encodeURIComponent(talk.message), {
+  // スピーカー名からIDを安全に取得
+  const speakerData = speakers.find(s => s.speaker === speaker);
+  if (!speakerData) {
+    throw new Error(`Speaker "${speaker}" not found.`);
+  }
+  const speakerId = speakerData.id;
+  console.log("speakerId:", speakerId);
+
+  // スピーカーIDとメッセージをエンコードしてURLを組み立てる
+  const ttsQueryUrl = `${VOICE_VOX_API_URL}/audio_query?speaker=${encodeURIComponent(speakerId)}&text=${encodeURIComponent(talk.message)}`;
+  const ttsQueryResponse = await fetch(ttsQueryUrl, {
     method: 'POST',
   });
   if (!ttsQueryResponse.ok) {
@@ -107,12 +117,16 @@ export const fetchAudioVoiceVox = async (
   }
   const ttsQueryJson = await ttsQueryResponse.json();
 
+  // TTSの設定値を調整
   ttsQueryJson['speedScale'] = 1.16;
   ttsQueryJson['pitchScale'] = -0.02;
   ttsQueryJson['intonationScale'] = 1.26;
-  const synthesisResponse = await fetch(VOICE_VOX_API_URL + '/synthesis?speaker=' + speaker, {
+
+  // シンセシスAPIへのリクエスト
+  const synthesisUrl = `${VOICE_VOX_API_URL}/synthesis?speaker=${encodeURIComponent(speakerId)}`;
+  const synthesisResponse = await fetch(synthesisUrl, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Transfer-Encoding': 'chunked' },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(ttsQueryJson)
   });
   if (!synthesisResponse.ok) {
@@ -122,6 +136,7 @@ export const fetchAudioVoiceVox = async (
   const buffer = await blob.arrayBuffer();
   return buffer;
 }
+
 
 export const fetchAudioGoogle = async (
   talk: Talk,
