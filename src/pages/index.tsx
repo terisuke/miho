@@ -8,7 +8,7 @@ import {
 } from "@/features/messages/messages";
 import { speakCharacter } from "@/features/messages/speakCharacter";
 import { MessageInputContainer } from "@/components/messageInputContainer";
-import { SYSTEM_PROMPT } from "@/features/constants/systemPromptConstants";
+import { PROMPTS } from "@/features/constants/systemPromptConstants";
 import { KoeiroParam, DEFAULT_PARAM } from "@/features/constants/koeiroParam";
 import { getOpenAIChatResponseStream } from "@/features/chat/openAiChat";
 import { getAnthropicChatResponseStream } from "@/features/chat/anthropicChat";
@@ -22,11 +22,12 @@ import { Meta } from "@/components/meta";
 import "@/lib/i18n";
 import { useTranslation } from 'react-i18next';
 import { fetchAndProcessComments } from "@/features/youtube/youtubeComments";
+import speakers from "@/components/speakers.json"; // 必要に応じてパスを修正してください
 
 export default function Home() {
   const { viewer } = useContext(ViewerContext);
 
-  const [systemPrompt, setSystemPrompt] = useState(SYSTEM_PROMPT);
+  const [systemPrompt, setSystemPrompt] = useState(PROMPTS.avatarSampleA);
   const [selectAIService, setSelectAIService] = useState("openai");
   const [selectAIModel, setSelectAIModel] = useState("gpt-3.5-turbo");
   const [openAiKey, setOpenAiKey] = useState("");
@@ -58,12 +59,13 @@ export default function Home() {
 
   // VRMモデル選択用のステートを追加
   const [selectVrmModel, setSelectVrmModel] = useState('/AvatarSample_A.vrm');
+  
 
   useEffect(() => {
     const storedData = window.localStorage.getItem("chatVRMParams");
     if (storedData) {
       const params = JSON.parse(storedData);
-      setSystemPrompt(params.systemPrompt || SYSTEM_PROMPT);
+      setSystemPrompt(params.systemPrompt || systemPrompt);
       setKoeiroParam(params.koeiroParam || DEFAULT_PARAM);
       setChatLog(Array.isArray(params.chatLog) ? params.chatLog : []);
       setCodeLog(Array.isArray(params.codeLog) ? params.codeLog : []);
@@ -89,7 +91,7 @@ export default function Home() {
       setStylebertvits2Style(params.stylebertvits2Style || "Neutral");
       setSelectVrmModel(params.selectVrmModel || "/AvatarSample_A.vrm"); // 追加
     }
-  }, []);
+  }, [systemPrompt]);
 
   useEffect(() => {
     const params = {
@@ -157,10 +159,46 @@ export default function Home() {
       const newChatLog = chatLog.map((v: Message, i) => {
         return i === targetIndex ? { role: v.role, content: text } : v;
       });
-
       setChatLog(newChatLog);
     },
     [chatLog]
+  );
+
+  const handleVrmChange = useCallback(
+    (newVrmModel: string) => {
+    setSelectVrmModel(newVrmModel);
+    console.log('VRMモデル:', newVrmModel);
+    let newSystemPrompt;
+    let speakerId;
+    switch (newVrmModel) {
+      case '/AvatarSample_A.vrm':
+        newSystemPrompt = PROMPTS.avatarSampleA;
+        speakerId = 2;
+        break;
+      case '/AvatarSample_C.vrm':
+        newSystemPrompt = PROMPTS.avatarSampleC;
+        speakerId = 12;
+        break;
+      case '/inuinu.vrm':
+        newSystemPrompt = PROMPTS.inuinu;
+        speakerId = 3;
+        break;
+      default:
+        newSystemPrompt = PROMPTS.avatarSampleA; // デフォルトのプロンプト
+        speakerId = 2;
+    }
+    setSystemPrompt(newSystemPrompt);
+    console.log('プロンプト:', newSystemPrompt);
+
+    // スピーカーIDに対応するスピーカー名を設定
+    const speaker = speakers.find(s => s.id === speakerId);
+    if (speaker) {
+      setVoicevoxSpeaker(speaker.speaker); // スピーカー名を設定
+      console.log('スピーカー:', speaker.speaker);
+    } else {
+      console.log('スピーカーが見つかりません');
+    }
+    }, [setSystemPrompt, setSelectVrmModel, setVoicevoxSpeaker]
   );
 
   const handleChangeCodeLog = useCallback(
@@ -516,6 +554,7 @@ export default function Home() {
         assistantMessage={assistantMessage}
         koeiromapKey={koeiromapKey}
         voicevoxSpeaker={voicevoxSpeaker}
+        setVoicevoxSpeaker={setVoicevoxSpeaker}
         googleTtsType={googleTtsType}
         stylebertvits2ServerUrl={stylebertvits2ServerUrl}
         stylebertvits2ModelId={stylebertvits2ModelId}
@@ -532,7 +571,7 @@ export default function Home() {
         onChangeYoutubeLiveId={setYoutubeLiveId}
         handleClickResetChatLog={() => setChatLog([])}
         handleClickResetCodeLog={() => setCodeLog([])}
-        handleClickResetSystemPrompt={() => setSystemPrompt(SYSTEM_PROMPT)}
+        handleClickResetSystemPrompt={() => setSystemPrompt(systemPrompt)}
         onChangeKoeiromapKey={setKoeiromapKey}
         onChangeVoicevoxSpeaker={setVoicevoxSpeaker}
         onChangeGoogleTtsType={setGoogleTtsType}

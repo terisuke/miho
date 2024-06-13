@@ -1,4 +1,5 @@
-import React, { useState, useCallback, useContext, useRef } from "react";
+// menu.tsx
+import React, { useState, useCallback, useContext, useRef, ChangeEvent } from "react";
 import { IconButton } from "./iconButton";
 import { Message } from "@/features/messages/messages";
 import { KoeiroParam } from "@/features/constants/koeiroParam";
@@ -32,6 +33,7 @@ type Props = {
   assistantMessage: string;
   koeiromapKey: string;
   voicevoxSpeaker: string;
+  setVoicevoxSpeaker: (speaker: string) => void;
   googleTtsType: string;
   stylebertvits2ServerUrl: string;
   onChangeStyleBertVits2ServerUrl: (key: string) => void;
@@ -88,6 +90,7 @@ export const Menu = ({
   assistantMessage,
   koeiromapKey,
   voicevoxSpeaker,
+  setVoicevoxSpeaker,
   googleTtsType,
   stylebertvits2ServerUrl,
   stylebertvits2ModelId,
@@ -118,6 +121,8 @@ export const Menu = ({
   selectLanguage,
   setSelectLanguage,
   setSelectVoiceLanguage,
+  selectVrmModel,
+  setSelectVrmModel,
 }: Props) => {
   const [showSettings, setShowSettings] = useState(false);
   const [showChatLog, setShowChatLog] = useState(false);
@@ -125,12 +130,11 @@ export const Menu = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { t } = useTranslation();
 
-  // VRMモデル選択用のステートを追加
-  const [selectVrmModel, setSelectVrmModel] = useState('/AvatarSample_A.vrm');
-
   const handleChangeSystemPrompt = useCallback(
-    (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-      onChangeSystemPrompt(event.target.value);
+    (event: ChangeEvent<HTMLTextAreaElement> | { target: { value: string } }) => {
+      if ('target' in event) {
+        onChangeSystemPrompt(event.target.value);
+      }
     },
     [onChangeSystemPrompt]
   );
@@ -328,6 +332,7 @@ export const Menu = ({
           koeiroParam={koeiroParam}
           koeiromapKey={koeiromapKey}
           voicevoxSpeaker={voicevoxSpeaker}
+          setVoicevoxSpeaker={setVoicevoxSpeaker}
           googleTtsType={googleTtsType}
           stylebertvits2ServerUrl={stylebertvits2ServerUrl}
           stylebertvits2ModelId={stylebertvits2ModelId}
