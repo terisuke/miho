@@ -17,12 +17,9 @@ import { getGroqChatResponseStream } from "@/features/chat/groqChat";
 import { getDifyChatResponseStream } from "@/features/chat/difyChat";
 import { Introduction } from "@/components/introduction";
 import { Menu } from "@/components/menu";
-import { GitHubLink } from "@/components/githubLink";
-import { Meta } from "@/components/meta";
 import "@/lib/i18n";
 import { useTranslation } from 'react-i18next';
 import { fetchAndProcessComments } from "@/features/youtube/youtubeComments";
-import speakers from "@/components/speakers.json"; // 必要に応じてパスを修正してください
 
 export default function Home() {
   const { viewer } = useContext(ViewerContext);
@@ -163,44 +160,6 @@ export default function Home() {
     },
     [chatLog]
   );
-
-  const handleVrmChange = useCallback(
-    (newVrmModel: string) => {
-    setSelectVrmModel(newVrmModel);
-    console.log('VRMモデル:', newVrmModel);
-    let newSystemPrompt;
-    let speakerId;
-    switch (newVrmModel) {
-      case '/AvatarSample_A.vrm':
-        newSystemPrompt = PROMPTS.avatarSampleA;
-        speakerId = 2;
-        break;
-      case '/AvatarSample_C.vrm':
-        newSystemPrompt = PROMPTS.avatarSampleC;
-        speakerId = 12;
-        break;
-      case '/inuinu.vrm':
-        newSystemPrompt = PROMPTS.inuinu;
-        speakerId = 3;
-        break;
-      default:
-        newSystemPrompt = PROMPTS.avatarSampleA; // デフォルトのプロンプト
-        speakerId = 2;
-    }
-    setSystemPrompt(newSystemPrompt);
-    console.log('プロンプト:', newSystemPrompt);
-
-    // スピーカーIDに対応するスピーカー名を設定
-    const speaker = speakers.find(s => s.id === speakerId);
-    if (speaker) {
-      setVoicevoxSpeaker(speaker.speaker); // スピーカー名を設定
-      console.log('スピーカー:', speaker.speaker);
-    } else {
-      console.log('スピーカーが見つかりません');
-    }
-    }, [setSystemPrompt, setSelectVrmModel, setVoicevoxSpeaker]
-  );
-
   const handleChangeCodeLog = useCallback(
     async (targetIndex: number, text: string) => {
       const newCodeLog = codeLog.map((v: Message, i) => {
@@ -519,7 +478,6 @@ export default function Home() {
 
   return (
     <div className={"font-M_PLUS_2"}>
-      <Meta />
       <Introduction
         openAiKey={openAiKey}
         koeiroMapKey={koeiromapKey}
@@ -587,8 +545,8 @@ export default function Home() {
         setSelectVoiceLanguage={setSelectVoiceLanguage}
         selectVrmModel={selectVrmModel} // 追加
         setSelectVrmModel={setSelectVrmModel} // 追加
+        setSystemPrompt={setSystemPrompt}
       />
-      <GitHubLink />
     </div>
   );
 }

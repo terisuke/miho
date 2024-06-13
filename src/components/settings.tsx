@@ -1,4 +1,3 @@
-// settings.tsx
 import React, { useContext, useCallback } from "react";
 import { IconButton } from "./iconButton";
 import { TextButton } from "./textButton";
@@ -34,6 +33,7 @@ type Props = {
   difyUrl: string;
   onChangeDifyUrl: (event: React.ChangeEvent<HTMLInputElement>) => void;
   systemPrompt: string;
+  setSystemPrompt: (prompt: string) => void;
   chatLog: Message[];
   codeLog: Message[];
   koeiroParam: KoeiroParam;
@@ -94,6 +94,7 @@ export const Settings = ({
   onChangeDifyUrl,
   chatLog,
   systemPrompt,
+  setSystemPrompt,
   koeiroParam,
   koeiromapKey,
   voicevoxSpeaker,
@@ -169,15 +170,16 @@ export const Settings = ({
       if (speaker) {
         setVoicevoxSpeaker(speaker.speaker); // スピーカー名を設定
       }
-      // デバッグメッセージ
+      
+      // デバッグ用のログ
       console.log('VRMモデル:', vrmFile);
       console.log('スピーカー:', speaker ? speaker.speaker : 'なし');
       console.log('プロンプト:', newSystemPrompt);
 
       // システムプロンプトを設定
-      onChangeSystemPrompt({ target: { value: newSystemPrompt } });
+      setSystemPrompt(newSystemPrompt);
     },
-    [setSelectVrmModel, viewer, setVoicevoxSpeaker, onChangeSystemPrompt]
+    [setSelectVrmModel, viewer, setVoicevoxSpeaker, setSystemPrompt]
   );
 
   // AIサービスごとのデフォルトモデルを設定

@@ -1,4 +1,3 @@
-// menu.tsx
 import React, { useState, useCallback, useContext, useRef, ChangeEvent } from "react";
 import { IconButton } from "./iconButton";
 import { Message } from "@/features/messages/messages";
@@ -27,6 +26,7 @@ type Props = {
   difyUrl: string;
   onChangeDifyUrl: (url: string) => void;
   systemPrompt: string;
+  setSystemPrompt: (prompt: string) => void;
   chatLog: Message[];
   codeLog: Message[];
   koeiroParam: KoeiroParam;
@@ -84,6 +84,7 @@ export const Menu = ({
   difyUrl,
   onChangeDifyUrl,
   systemPrompt,
+  setSystemPrompt,
   chatLog,
   codeLog,
   koeiroParam,
@@ -329,6 +330,7 @@ export const Menu = ({
           chatLog={chatLog}
           codeLog={codeLog}
           systemPrompt={systemPrompt}
+          setSystemPrompt={setSystemPrompt}
           koeiroParam={koeiroParam}
           koeiromapKey={koeiromapKey}
           voicevoxSpeaker={voicevoxSpeaker}
