@@ -599,7 +599,7 @@ export default function Home() {
   useEffect(() => {
     console.log("chatProcessingCount:", chatProcessingCount);
     fetchAndProcessCommentsCallback();
-  }, [chatProcessingCount, youtubeLiveId, youtubeApiKey, conversationContinuityMode]);
+  }, [chatProcessingCount, youtubeLiveId, youtubeApiKey, conversationContinuityMode, fetchAndProcessCommentsCallback]);
 
   useEffect(() => {
     if (youtubeNoCommentCount < 1) return;
@@ -607,7 +607,7 @@ export default function Home() {
     setTimeout(() => {
       fetchAndProcessCommentsCallback();
     }, INTERVAL_MILL_SECONDS_RETRIEVING_COMMENTS);
-  }, [youtubeNoCommentCount, conversationContinuityMode]);
+  }, [youtubeNoCommentCount, conversationContinuityMode, youtubeSleepMode, fetchAndProcessCommentsCallback]);
 
   return (
     <>

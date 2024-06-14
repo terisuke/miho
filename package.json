@@ -7,48 +7,43 @@
     "build": "next build",
     "start": "next build && next start",
     "export": "next export",
-    "lint": "next lint",
-    "electron": "wait-on http://localhost:3000 && electron ./electron.mjs",
-    "desktop": "NEXT_PUBLIC_BACKGROUND_IMAGE_PATH=\"\" run-p dev electron"
+    "lint": "next lint"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.20.8",
     "@charcoal-ui/icons": "^2.6.0",
     "@google-cloud/text-to-speech": "^5.0.1",
-    "@google/generative-ai": "^0.11.3",
+    "@google/generative-ai": "^0.12.0",
+    "@pixiv/three-vrm": "^2.1.2",
     "@tailwindcss/line-clamp": "^0.4.4",
     "@types/dom-speech-recognition": "^0.0.1",
     "axios": "^1.6.8",
     "eslint": "8.36.0",
     "eslint-config-next": "13.2.4",
     "groq-sdk": "^0.3.3",
-    "i18next": "^23.6.0",
-    "next": "13.2.4",
+    "i18next": "^23.11.5",
+    "next": "^13.5.6",
     "node-fetch": "^3.3.1",
     "openai": "^4.38.5",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-i18next": "^13.3.1",
-    "three": "^0.149.0",
-    "typescript": "5.0.2"
+    "three": "^0.164.0",
+    "typescript": "^5.1.3"
   },
   "devDependencies": {
     "@charcoal-ui/tailwind-config": "^2.6.0",
     "@gltf-transform/core": "^2.4.6",
-    "@pixiv/three-vrm": "^1.0.9",
-    "@types/node": "18.15.10",
-    "@types/react": "18.0.29",
+    "@types/i18next": "^13.0.0",
+    "@types/node": "^18.15.10",
+    "@types/react": "^18.0.29",
     "@types/react-dom": "18.0.11",
-    "@types/three": "0.149.0",
+    "@types/three": "^0.164.0",
     "autoprefixer": "^10.4.14",
-    "electron": "^30.0.8",
-    "electron-is-dev": "^3.0.1",
-    "npm-run-all": "^4.1.5",
     "postcss": "^8.4.21",
-    "tailwindcss": "^3.3.1",
-    "wait-on": "^7.2.0"
+    "tailwindcss": "^3.3.1"
   },
   "engines": {
-    "node": "16.14.2"
+    "node": ">=16.14.2"
   }
 }
