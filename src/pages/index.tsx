@@ -476,6 +476,10 @@ export default function Home() {
     return () => clearInterval(intervalId);
   }, [youtubeLiveId, youtubeApiKey, handleSendChat]);
 
+  function handleChangeSystemPrompt(systemPrompt: string): void {
+    throw new Error("Function not implemented.");
+  }
+
   return (
     <div className={"font-M_PLUS_2"}>
       <Introduction
@@ -520,7 +524,7 @@ export default function Home() {
         youtubeMode={youtubeMode}
         youtubeApiKey={youtubeApiKey}
         youtubeLiveId={youtubeLiveId}
-        onChangeSystemPrompt={setSystemPrompt}
+        setSystemPrompt={setSystemPrompt}
         onChangeChatLog={handleChangeChatLog}
         onChangeCodeLog={handleChangeCodeLog}
         onChangeKoeiromapParam={setKoeiroParam}
@@ -545,8 +549,9 @@ export default function Home() {
         setSelectVoiceLanguage={setSelectVoiceLanguage}
         selectVrmModel={selectVrmModel} // 追加
         setSelectVrmModel={setSelectVrmModel} // 追加
-        setSystemPrompt={setSystemPrompt}
-      />
+        onChangeSystemPrompt={function (systemPrompt: string): void {
+          throw new Error("Function not implemented.");
+        } }        />
     </div>
   );
 }

@@ -138,49 +138,48 @@ export const Settings = ({
   const { viewer } = useContext(ViewerContext);
 
   const handleVrmChange = useCallback(
-    (event: React.ChangeEvent<HTMLSelectElement>) => {
-      const vrmFile = event.target.value;
-      setSelectVrmModel(vrmFile); // 選択したモデルを状態に保存
-      viewer.loadVrm(buildUrl(vrmFile)); // 選択したモデルを読み込む
+  (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const vrmFile = event.target.value;
+    setSelectVrmModel(vrmFile); // 選択したモデルを状態に保存
+    viewer.loadVrm(buildUrl(vrmFile)); // 選択したモデルを読み込む
 
-      // VRMモデルに応じてスピーカーとシステムプロンプトを変更
-      let speakerId; // スピーカーIDを初期化
-      let newSystemPrompt;
-      switch (vrmFile) {
-        case '/AvatarSample_A.vrm':
-          speakerId = 2; // 四国めたん/普通のID
-          newSystemPrompt = PROMPTS.avatarSampleA;
-          break;
-        case '/AvatarSample_C.vrm':
-          speakerId = 12; // 白上虎太郎/普通のID
-          newSystemPrompt = PROMPTS.avatarSampleC;
-          break;
-        case '/inuinu.vrm':
-          speakerId = 3; // ずんだもん/普通のID
-          newSystemPrompt = PROMPTS.inuinu;
-          break;
-        default:
-          speakerId = 2; // 四国めたん/普通のID
-          newSystemPrompt = PROMPTS.avatarSampleA;
-          break;
-      }
+    // VRMモデルに応じてスピーカーとシステムプロンプトを変更
+    let speakerId; // スピーカーIDを初期化
+    let newSystemPrompt;
+    switch (vrmFile) {
+      case '/AvatarSample_A.vrm':
+        speakerId = 2; // 四国めたん/普通のID
+        newSystemPrompt = PROMPTS.avatarSampleA;
+        break;
+      case '/AvatarSample_C.vrm':
+        speakerId = 12; // 白上虎太郎/普通のID
+        newSystemPrompt = PROMPTS.avatarSampleC;
+        break;
+      case '/inuinu.vrm':
+        speakerId = 3; // ずんだもん/普通のID
+        newSystemPrompt = PROMPTS.inuinu;
+        break;
+      default:
+        speakerId = 2; // 四国めたん/普通のID
+        newSystemPrompt = PROMPTS.avatarSampleA;
+        break;
+    }
 
-      // スピーカーIDに対応するスピーカー名を設定
-      const speaker = speakers.find(s => s.id === speakerId);
-      if (speaker) {
-        setVoicevoxSpeaker(speaker.speaker); // スピーカー名を設定
-      }
-      
-      // デバッグ用のログ
-      console.log('VRMモデル:', vrmFile);
-      console.log('スピーカー:', speaker ? speaker.speaker : 'なし');
-      console.log('プロンプト:', newSystemPrompt);
+    // スピーカーIDに対応するスピーカー名を設定
+    const speaker = speakers.find(s => s.id === speakerId);
+    if (speaker) {
+      setVoicevoxSpeaker(speaker.speaker); // スピーカー名を設定
+    }
+    // デバッグメッセージ
+    console.log('VRMモデル:', vrmFile);
+    console.log('スピーカー:', speaker ? speaker.speaker : 'なし');
+    console.log('プロンプト:', newSystemPrompt);
 
-      // システムプロンプトを設定
-      setSystemPrompt(newSystemPrompt);
-    },
-    [setSelectVrmModel, viewer, setVoicevoxSpeaker, setSystemPrompt]
-  );
+    // システムプロンプトを設定
+    setSystemPrompt(newSystemPrompt);
+  },
+  [setSelectVrmModel, viewer, setVoicevoxSpeaker, systemPrompt]
+);
 
   // AIサービスごとのデフォルトモデルを設定
   const defaultModels: { [key: string]: string } = {

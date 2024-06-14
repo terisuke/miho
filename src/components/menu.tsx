@@ -25,6 +25,8 @@ type Props = {
   onChangeDifyKey: (key: string) => void;
   difyUrl: string;
   onChangeDifyUrl: (url: string) => void;
+  selectVrmModel: string;
+  setSelectVrmModel: (model: string) => void;
   systemPrompt: string;
   setSystemPrompt: (prompt: string) => void;
   chatLog: Message[];
@@ -64,8 +66,6 @@ type Props = {
   selectLanguage: string;
   setSelectLanguage: (show: string) => void;
   setSelectVoiceLanguage: (show: string) => void;
-  selectVrmModel: string;
-  setSelectVrmModel: (model: string) => void;
 };
 
 export const Menu = ({
