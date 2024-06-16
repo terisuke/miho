@@ -1,5 +1,5 @@
 import { MessageInput } from "@/components/messageInput";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 type Props = {
   isChatProcessing: boolean;
@@ -18,68 +18,120 @@ export const MessageInputContainer = ({
   onChatProcessStart,
   selectVoiceLanguage
 }: Props) => {
+  console.log("MessageInputContainer コンポーネントがレンダリングされました。");
   const [userMessage, setUserMessage] = useState("");
-  const [speechRecognition, setSpeechRecognition] =
-    useState<SpeechRecognition>();
+  const [speechRecognition, setSpeechRecognition] = useState<SpeechRecognition | null>(null);
   const [isMicRecording, setIsMicRecording] = useState(false);
+  const silenceTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  const SILENCE_DURATION = 5000; // 5秒の無音で終了とする
+
+  const onChatProcessStartRef = useRef(onChatProcessStart);
+  const isChatProcessingRef = useRef(isChatProcessing);
+
+  useEffect(() => {
+    console.log("onChatProcessStart が更新されました。");
+    onChatProcessStartRef.current = onChatProcessStart;
+  }, [onChatProcessStart]);
+
+  useEffect(() => {
+    console.log("isChatProcessing が更新されました。");
+    isChatProcessingRef.current = isChatProcessing;
+  }, [isChatProcessing]);
+
+  // 無音タイマーをリセットする関数
+  const resetSilenceTimer = useCallback(() => {
+    console.log("無音タイマーをリセットします。");
+    if (silenceTimeout.current) {
+      clearTimeout(silenceTimeout.current);
+    }
+    silenceTimeout.current = setTimeout(() => {
+      if (speechRecognition) {
+        speechRecognition.stop();
+      }
+    }, SILENCE_DURATION);
+  }, [speechRecognition]);
 
   // 音声認識の結果を処理する
-  const handleRecognitionResult = useCallback(
-    (event: SpeechRecognitionEvent) => {
-      const text = event.results[0][0].transcript;
-      setUserMessage(text);
+  const handleRecognitionResult = useCallback((event: SpeechRecognitionEvent) => {
+    console.log("音声認識の結果を処理します。");
+    const text = event.results[0][0].transcript;
+    setUserMessage(text);
 
-      // 発言の終了時
-      if (event.results[0].isFinal) {
-        setUserMessage(text);
-        // 返答文の生成を開始
-        onChatProcessStart(text);
-      }
-    },
-    [onChatProcessStart]
-  );
+    // 発言の終了時
+    if (event.results[0].isFinal) {
+      setUserMessage(text);
+      // 返答文の生成を開始
+      onChatProcessStartRef.current(text);
+    }
+    resetSilenceTimer(); // 無音タイマーをリセット
+  }, [resetSilenceTimer]);
 
   // 無音が続いた場合も終了する
   const handleRecognitionEnd = useCallback(() => {
+    console.log("音声認識が終了しました。");
     setIsMicRecording(false);
-  }, []);
+
+    // 一定時間無音が続いた場合に再度音声認識を開始する
+    if (!isChatProcessingRef.current && speechRecognition) {
+      setTimeout(() => {
+        if (speechRecognition) {
+          speechRecognition.start();
+          setIsMicRecording(true);
+        }
+      }, SILENCE_DURATION);
+    }
+  }, [speechRecognition]);
 
   const handleClickMicButton = useCallback(() => {
-    if (isMicRecording) {
-      speechRecognition?.abort();
+    console.log("マイクボタンがクリックされました。");
+    if (isMicRecording && speechRecognition) {
+      speechRecognition.abort();
       setIsMicRecording(false);
-
+      if (silenceTimeout.current) {
+        clearTimeout(silenceTimeout.current);
+      }
       return;
     }
 
-    speechRecognition?.start();
-    setIsMicRecording(true);
-  }, [isMicRecording, speechRecognition]);
+    if (speechRecognition) {
+      speechRecognition.start();
+      setIsMicRecording(true);
+      resetSilenceTimer(); // 無音タイマーを開始
+    }
+  }, [isMicRecording, speechRecognition, resetSilenceTimer]);
 
   const handleClickSendButton = useCallback(() => {
+    console.log("送信ボタンがクリックされました。");
     onChatProcessStart(userMessage);
   }, [onChatProcessStart, userMessage]);
 
   useEffect(() => {
-    const SpeechRecognition =
-      window.webkitSpeechRecognition || window.SpeechRecognition;
+    console.log("SpeechRecognition を設定します。");
+    const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
 
-    // FirefoxなどSpeechRecognition非対応環境対策
     if (!SpeechRecognition) {
       return;
     }
+
     const recognition = new SpeechRecognition();
     recognition.lang = selectVoiceLanguage;
-    recognition.interimResults = true; // 認識の途中結果を返す
-    recognition.continuous = false; // 発言の終了時に認識を終了する
+    recognition.interimResults = true;
+    recognition.continuous = false;
 
     recognition.addEventListener("result", handleRecognitionResult);
     recognition.addEventListener("end", handleRecognitionEnd);
 
     setSpeechRecognition(recognition);
-  }, [handleRecognitionResult, handleRecognitionEnd, selectVoiceLanguage]);
+
+    return () => {
+      recognition.removeEventListener("result", handleRecognitionResult);
+      recognition.removeEventListener("end", handleRecognitionEnd);
+    };
+  }, [selectVoiceLanguage]);
 
   useEffect(() => {
+    console.log("isChatProcessing が変更されました。");
     if (!isChatProcessing) {
       setUserMessage("");
     }

@@ -13,11 +13,14 @@ import {
 import { Link } from "./link";
 import i18n from "i18next";
 import { useTranslation } from "react-i18next";
-import speakers from "./speakers.json";
+import { SYSTEM_PROMPT } from "@/features/constants/systemPromptConstants";
+
 
 type Props = {
   selectAIService: string;
   onChangeAIService: (event: React.ChangeEvent<HTMLSelectElement>) => void;
+  userName: string;
+  setUserName: (name: string) => void;
   selectAIModel: string;
   setSelectAIModel: (model: string) => void;
   openAiKey: string;
@@ -35,6 +38,7 @@ type Props = {
   difyUrl: string;
   onChangeDifyUrl: (event: React.ChangeEvent<HTMLInputElement>) => void;
   systemPrompt: string;
+  setSystemPrompt: (prompt: string) => void;
   chatLog: Message[];
   codeLog: Message[];
   koeiroParam: KoeiroParam;
@@ -91,10 +95,13 @@ export const Settings = ({
   onChangeAIService,
   selectAIModel,
   setSelectAIModel,
-  openAiKey,
-  onChangeOpenAiKey,
-  anthropicKey,
-  onChangeAnthropicKey,
+  userName,
+  setUserName,
+  setSystemPrompt,
+  // openAiKey,
+  // onChangeOpenAiKey,
+  // anthropicKey,
+  // onChangeAnthropicKey,
   googleKey,
   onChangeGoogleKey,
   groqKey,
@@ -128,7 +135,7 @@ export const Settings = ({
   onClickResetCodeLog,
   onClickResetSystemPrompt,
   onChangeKoeiromapKey,
-  onChangeVoicevoxSpeaker,
+  // onChangeVoicevoxSpeaker,
   onChangeGoogleTtsType,
   onChangeStyleBertVits2ServerUrl,
   onChangeStyleBertVits2ModelId,
@@ -144,7 +151,7 @@ export const Settings = ({
   selectLanguage,
   setSelectLanguage,
   setSelectVoiceLanguage,
-  onClickTestVoice,
+  // onClickTestVoice,
   gsviTtsServerUrl,
   onChangeGSVITtsServerUrl,
   gsviTtsModelId,
@@ -170,6 +177,13 @@ export const Settings = ({
     // Set default voicevoxSpeaker to id:2
     setVoicevoxSpeaker('2');
   }, [setSelectLanguage]);
+
+  // ユーザー名を更新する関数
+  const onChangeUserName = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newUserName = event.target.value;
+    setUserName(newUserName);
+    setSystemPrompt(SYSTEM_PROMPT(newUserName));
+  };
 
   // オブジェクトを定義して、各AIサービスのデフォルトモデルを保存する
   // ローカルLLMが選択された場合、AIモデルを空文字に設定
@@ -251,6 +265,18 @@ export const Settings = ({
             <div className="my-16 typography-20 font-bold">{t("BackgroundImage")}</div>
             <div className="my-8">
               <TextButton onClick={onClickOpenBgFile}>{t("ChangeBackgroundImage")}</TextButton>
+            </div>
+          </div>
+          {/* UserNameの設定 */}
+          <div className="my-40">
+            <div className="my-16 typography-20 font-bold">{t("UserName")}</div>
+            <div className="my-8">
+              <input
+                className="px-16 py-8 bg-surface1 hover:bg-surface1-hover rounded-8"
+                type="text"
+                value={userName}
+                onChange={onChangeUserName}
+              />
             </div>
           </div>
           {/* 外部接続モード */}

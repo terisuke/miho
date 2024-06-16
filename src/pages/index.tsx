@@ -27,9 +27,10 @@ import { buildUrl } from "@/utils/buildUrl";
 export default function Home() {
   const { viewer } = useContext(ViewerContext);
 
-  const [systemPrompt, setSystemPrompt] = useState(SYSTEM_PROMPT);
+  const [userName, setUserName] = useState("きみ");
+  const [systemPrompt, setSystemPrompt] = useState(() => SYSTEM_PROMPT("きみ"));
   const [selectAIService, setSelectAIService] = useState("openai");
-  const [selectAIModel, setSelectAIModel] = useState("gpt-3.5-turbo");
+  const [selectAIModel, setSelectAIModel] = useState("gpt-4o");
   const [openAiKey, setOpenAiKey] = useState("");
   const [anthropicKey, setAnthropicKey] = useState("");
   const [googleKey, setGoogleKey] = useState("");
@@ -85,12 +86,13 @@ export default function Home() {
     const storedData = window.localStorage.getItem("chatVRMParams");
     if (storedData) {
       const params = JSON.parse(storedData);
-      setSystemPrompt(params.systemPrompt || SYSTEM_PROMPT);
+      setUserName(params.userName || "きみ");
+      setSystemPrompt(() => SYSTEM_PROMPT(params.userName || "きみ"));
       setKoeiroParam(params.koeiroParam || DEFAULT_PARAM);
       setChatLog(Array.isArray(params.chatLog) ? params.chatLog : []);
       setCodeLog(Array.isArray(params.codeLog) ? params.codeLog : []);
       setSelectAIService(params.selectAIService || "openai");
-      setSelectAIModel(params.selectAIModel || "gpt-3.5-turbo");
+      setSelectAIModel(params.selectAIModel || "gpt-4o");
       setOpenAiKey(params.openAiKey || "");
       setAnthropicKey(params.anthropicKey || "");
       setGoogleKey(params.googleKey || "");
@@ -121,6 +123,7 @@ export default function Home() {
 
   useEffect(() => {
     const params = {
+      userName,
       systemPrompt,
       koeiroParam,
       chatLog,
@@ -159,6 +162,7 @@ export default function Home() {
       )
     );
   }, [
+    userName,
     systemPrompt,
     koeiroParam,
     chatLog,
@@ -629,73 +633,76 @@ export default function Home() {
           selectVoiceLanguage={selectVoiceLanguage}
         />
         <Menu
-          selectAIService={selectAIService}
-          onChangeAIService={setSelectAIService}
-          selectAIModel={selectAIModel}
-          setSelectAIModel={setSelectAIModel}
-          openAiKey={openAiKey}
-          onChangeOpenAiKey={setOpenAiKey}
-          anthropicKey={anthropicKey}
-          onChangeAnthropicKey={setAnthropicKey}
-          googleKey={googleKey}
-          onChangeGoogleKey={setGoogleKey}
-          groqKey={groqKey}
-          onChangeGroqKey={setGroqKey}
-          localLlmUrl={localLlmUrl}
-          onChangeLocalLlmUrl={setLocalLlmUrl}
-          difyKey={difyKey}
-          onChangeDifyKey={setDifyKey}
-          difyUrl={difyUrl}
-          onChangeDifyUrl={setDifyUrl}
-          systemPrompt={systemPrompt}
-          chatLog={chatLog}
-          codeLog={codeLog}
-          koeiroParam={koeiroParam}
-          assistantMessage={assistantMessage}
-          koeiromapKey={koeiromapKey}
-          voicevoxSpeaker={voicevoxSpeaker}
-          googleTtsType={googleTtsType}
-          stylebertvits2ServerUrl={stylebertvits2ServerUrl}
-          stylebertvits2ModelId={stylebertvits2ModelId}
-          stylebertvits2Style={stylebertvits2Style}
-          youtubeMode={youtubeMode}
-          youtubeApiKey={youtubeApiKey}
-          youtubeLiveId={youtubeLiveId}
-          conversationContinuityMode={conversationContinuityMode}
-          onChangeSystemPrompt={setSystemPrompt}
-          onChangeChatLog={handleChangeChatLog}
-          onChangeCodeLog={handleChangeCodeLog}
-          onChangeKoeiromapParam={setKoeiroParam}
-          onChangeYoutubeMode={setYoutubeMode}
-          onChangeYoutubeApiKey={setYoutubeApiKey}
-          onChangeYoutubeLiveId={setYoutubeLiveId}
-          onChangeConversationContinuityMode={setConversationContinuityMode}
-          handleClickResetChatLog={() => setChatLog([])}
-          handleClickResetCodeLog={() => setCodeLog([])}
-          handleClickResetSystemPrompt={() => setSystemPrompt(SYSTEM_PROMPT)}
-          onChangeKoeiromapKey={setKoeiromapKey}
-          onChangeVoicevoxSpeaker={setVoicevoxSpeaker}
-          onChangeGoogleTtsType={setGoogleTtsType}
-          onChangeStyleBertVits2ServerUrl={setStylebertvits2ServerURL}
-          onChangeStyleBertVits2ModelId={setStylebertvits2ModelId}
-          onChangeStyleBertVits2Style={setStylebertvits2Style}
-          webSocketMode={webSocketMode}
-          changeWebSocketMode={changeWebSocketMode}
-          selectVoice={selectVoice}
-          setSelectVoice={setSelectVoice}
-          selectLanguage={selectLanguage}
-          setSelectLanguage={setSelectLanguage}
-          setSelectVoiceLanguage={setSelectVoiceLanguage}
-          setBackgroundImageUrl={setBackgroundImageUrl}
-          gsviTtsServerUrl={gsviTtsServerUrl}
-          onChangeGSVITtsServerUrl={setGSVITTSServerUrl}
-          gsviTtsModelId={gsviTtsModelId}
-          onChangeGSVITtsModelId={setGSVITTSModelID}
-          gsviTtsBatchSize={gsviTtsBatchSize}
-          onChangeGVITtsBatchSize={setGSVITTSBatchSize}
-          gsviTtsSpeechRate={gsviTtsSpeechRate}
-          onChangeGSVITtsSpeechRate={setGSVITTSSpeechRate}
-        />
+        selectAIService={selectAIService}
+        onChangeAIService={setSelectAIService}
+        selectAIModel={selectAIModel}
+        setSelectAIModel={setSelectAIModel}
+        userName={userName}
+        setUserName={setUserName}
+        openAiKey={openAiKey}
+        onChangeOpenAiKey={setOpenAiKey}
+        anthropicKey={anthropicKey}
+        onChangeAnthropicKey={setAnthropicKey}
+        googleKey={googleKey}
+        onChangeGoogleKey={setGoogleKey}
+        groqKey={groqKey}
+        onChangeGroqKey={setGroqKey}
+        localLlmUrl={localLlmUrl}
+        onChangeLocalLlmUrl={setLocalLlmUrl}
+        difyKey={difyKey}
+        onChangeDifyKey={setDifyKey}
+        difyUrl={difyUrl}
+        onChangeDifyUrl={setDifyUrl}
+        systemPrompt={systemPrompt}
+        chatLog={chatLog}
+        codeLog={codeLog}
+        koeiroParam={koeiroParam}
+        assistantMessage={assistantMessage}
+        koeiromapKey={koeiromapKey}
+        voicevoxSpeaker={voicevoxSpeaker}
+        googleTtsType={googleTtsType}
+        stylebertvits2ServerUrl={stylebertvits2ServerUrl}
+        stylebertvits2ModelId={stylebertvits2ModelId}
+        stylebertvits2Style={stylebertvits2Style}
+        youtubeMode={youtubeMode}
+        youtubeApiKey={youtubeApiKey}
+        youtubeLiveId={youtubeLiveId}
+        conversationContinuityMode={conversationContinuityMode}
+        onChangeSystemPrompt={setSystemPrompt}
+        onChangeChatLog={handleChangeChatLog}
+        onChangeCodeLog={handleChangeCodeLog}
+        onChangeKoeiromapParam={setKoeiroParam}
+        onChangeYoutubeMode={setYoutubeMode}
+        onChangeYoutubeApiKey={setYoutubeApiKey}
+        onChangeYoutubeLiveId={setYoutubeLiveId}
+        onChangeConversationContinuityMode={setConversationContinuityMode}
+        handleClickResetChatLog={() => setChatLog([])}
+        handleClickResetCodeLog={() => setCodeLog([])}
+        handleClickResetSystemPrompt={() => setSystemPrompt(SYSTEM_PROMPT("きみ"))}
+        onChangeKoeiromapKey={setKoeiromapKey}
+        onChangeVoicevoxSpeaker={setVoicevoxSpeaker}
+        onChangeGoogleTtsType={setGoogleTtsType}
+        onChangeStyleBertVits2ServerUrl={setStylebertvits2ServerURL}
+        onChangeStyleBertVits2ModelId={setStylebertvits2ModelId}
+        onChangeStyleBertVits2Style={setStylebertvits2Style}
+        webSocketMode={webSocketMode}
+        changeWebSocketMode={changeWebSocketMode}
+        selectVoice={selectVoice}
+        setSelectVoice={setSelectVoice}
+        selectLanguage={selectLanguage}
+        setSelectLanguage={setSelectLanguage}
+        setSelectVoiceLanguage={setSelectVoiceLanguage}
+        setBackgroundImageUrl={setBackgroundImageUrl}
+        gsviTtsServerUrl={gsviTtsServerUrl}
+        onChangeGSVITtsServerUrl={setGSVITTSServerUrl}
+        gsviTtsModelId={gsviTtsModelId}
+        onChangeGSVITtsModelId={setGSVITTSModelID}
+        gsviTtsBatchSize={gsviTtsBatchSize}
+        onChangeGVITtsBatchSize={setGSVITTSBatchSize}
+        gsviTtsSpeechRate={gsviTtsSpeechRate}
+        onChangeGSVITtsSpeechRate={setGSVITTSSpeechRate}
+        setSystemPrompt={setSystemPrompt}
+      />
       </div>
     </>
   );

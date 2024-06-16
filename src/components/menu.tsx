@@ -77,12 +77,18 @@ type Props = {
   onChangeGVITtsBatchSize: (speed: number) => void;
   gsviTtsSpeechRate: number;
   onChangeGSVITtsSpeechRate: (speed: number) => void;
+  userName: string;
+  setUserName: (name: string) => void;
+  setSystemPrompt: (prompt: string) => void;
 };
+
 export const Menu = ({
   selectAIService,
   onChangeAIService,
   selectAIModel,
   setSelectAIModel,
+  userName,
+  setUserName,
   openAiKey,
   onChangeOpenAiKey,
   anthropicKey,
@@ -145,6 +151,7 @@ export const Menu = ({
   onChangeGVITtsBatchSize,
   gsviTtsSpeechRate,
   onChangeGSVITtsSpeechRate,
+  setSystemPrompt,
 }: Props) => {
   const [showSettings, setShowSettings] = useState(false);
   const [showChatLog, setShowChatLog] = useState(false);
@@ -412,6 +419,9 @@ export const Menu = ({
           onChangeAIService={handleChangeAIService}
           selectAIModel={selectAIModel}
           setSelectAIModel={setSelectAIModel}
+          userName={userName}
+          setUserName={setUserName}
+          setSystemPrompt={setSystemPrompt}
           openAiKey={openAiKey}
           onChangeOpenAiKey={handleOpenAiKeyChange}
           anthropicKey={anthropicKey}

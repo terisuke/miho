@@ -42,6 +42,7 @@
   "UsingVoiceVox": "VOICEVOXを使用する（Japanese Only）",
   "UsingGoogleTTS": "Google TTSを使用する",
   "UsingStyleBertVITS2": "Style-Bert-VITS2を使用する",
+  "UserName": "ユーザー名",
   "StyleBertVITS2Info": "Style-Bert-VITS2を使用しています。ローカルAPIを使用するので下記のサイトから環境にあったアプリをダウンロードし、起動しておく必要があります。",
   "SpeakerSelection": "ボイスタイプ選択",
   "GoogleTTSInfo": "Google Cloud Text-to-Speechを使用しています。多言語に対応可能です。",
