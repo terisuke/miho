@@ -1,4 +1,5 @@
-import { MessageInput } from "@/components/messageInput";
+import React from "react";
+import { MessageInput } from "./messageInput";
 import { useState, useEffect, useCallback } from "react";
 
 type Props = {
