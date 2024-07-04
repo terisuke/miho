@@ -516,7 +516,8 @@ export default function Home() {
     const auth = getAuth();
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
-        setUserId(user.uid); // ユーザーIDを設定
+        setUserId(user.uid);
+        handleSendChat("「こんにちわ、私美穂！あなたの名前は？「」で囲んで教えてね♪」のように挨拶をした上で、自然に「」内にユーザーのなめを取得できる質問をしてください", "assistant");// ユーザーIDを設定
       } else {
         setUserId(null);
       }
