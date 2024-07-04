@@ -45,3 +45,4 @@ credentials.json
 
 # asdf
 .tool-versions
+.firebase/aipartner-426616/functions/node_modules/@next/swc-darwin-arm64/next-swc.darwin-arm64.node
