@@ -1,4 +1,5 @@
-import { buildUrl } from "@/utils/buildUrl";
+import React from 'react';
+// import { buildUrl } from "@/utils/buildUrl";
 import Head from "next/head";
 export const Meta = () => {
   const title = "Your Partner AI Proto";
