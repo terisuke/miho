@@ -82,5 +82,12 @@
   "GSVITTSServerUrl": "GSVI TTS Endpoint API",
   "GSVITTSModelID": "GSVI TTS Model ID",
   "GSVITTSBatchSize": "GSVI TTS Batch Size (1 ~ 100 The larger the value, the faster the inference speed, but it might exhaust memory if too large.)",
-  "GSVITTSSpeechRate": "Speech Rate (0.5 ~ 2.0 The bigger the value, the faster it is.)"
+  "GSVITTSSpeechRate": "Speech Rate (0.5 ~ 2.0 The bigger the value, the faster it is.)",
+  "Login": "Login",
+  "Email": "Email",
+  "Password": "Password",
+  "Login with Google": "Login with Google",
+  "Don't have an account?": "Don't have an account?",
+  "Sign Up": "Sign Up",
+  "Already have an account?": "Already have an account?"
 }

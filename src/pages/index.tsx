@@ -23,9 +23,14 @@ import "@/lib/i18n";
 import { useTranslation } from 'react-i18next';
 import { fetchAndProcessComments } from "@/features/youtube/youtubeComments";
 import { buildUrl } from "@/utils/buildUrl";
+import { saveChatLog } from "@/services/chatService"; // 追加
+import { getAuth } from "firebase/auth";
 
 export default function Home() {
   const { viewer } = useContext(ViewerContext);
+  
+  // userId の宣言を useEffect の上に移動
+  const [userId, setUserId] = useState<string | null>(null); // ユーザーIDを管理する状態
 
   const [userName, setUserName] = useState("きみ");
   const [systemPrompt, setSystemPrompt] = useState(() => SYSTEM_PROMPT("きみ"));
@@ -113,7 +118,7 @@ export default function Home() {
       setStylebertvits2ServerURL(params.stylebertvits2ServerUrl || "http://127.0.0.1:5000");
       setStylebertvits2ModelId(params.stylebertvits2ModelId || "0");
       setStylebertvits2Style(params.stylebertvits2Style || "Neutral");
-      setDontShowIntroduction(params.dontShowIntroduction || false);
+      setDontShowIntroduction(params.dontShowIntroduction || true);
       setGSVITTSServerUrl(params.gsviTtsServerUrl || "http://127.0.0.1:5000/tts");
       setGSVITTSModelID(params.gsviTtsModelId || "");
       setGSVITTSBatchSize(params.gsviTtsBatchSize || 2);
@@ -203,8 +208,12 @@ export default function Home() {
       });
 
       setChatLog(newChatLog);
+      // ログが変更されたときに保存
+      if (userId) {
+        saveChatLog(userId, newChatLog); // 現在のユーザーのUIDを使用
+      }
     },
-    [chatLog]
+    [chatLog, userId]
   );
 
   const handleChangeCodeLog = useCallback(
@@ -304,7 +313,7 @@ export default function Home() {
       setChatProcessing(false);
       return;
     }
-
+    
     const reader = stream.getReader();
     let receivedMessage = "";
     let aiTextLog = "";
@@ -373,7 +382,12 @@ export default function Home() {
     ];
     setChatLog(messageLogAssistant);
     setChatProcessing(false);
-  }, [selectAIService, openAiKey, selectAIModel, anthropicKey, googleKey, localLlmUrl, groqKey, difyKey, difyUrl, koeiroParam, handleSpeakAi]);
+
+    // Firestoreにチャットログを保存
+    if (userId) {
+      saveChatLog(userId, messageLogAssistant); // 現在のユーザーのUIDを使用
+    }
+  }, [selectAIService, openAiKey, selectAIModel, anthropicKey, googleKey, localLlmUrl, groqKey, difyKey, difyUrl, koeiroParam, handleSpeakAi, userId]);
 
   const preProcessAIResponse = useCallback(async (messages: Message[]) => {
     await processAIResponse(chatLog, messages);
@@ -497,6 +511,20 @@ export default function Home() {
     emotion: string;
   }
   const [tmpMessages, setTmpMessages] = useState<tmpMessage[]>([]);
+
+  useEffect(() => {
+    const auth = getAuth();
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        setUserId(user.uid); // ユーザーIDを設定
+      } else {
+        setUserId(null);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
 
   useEffect(() => {
     const handleOpen = (event: Event) => {

@@ -1,7 +1,7 @@
 {
   "name": "chat-vrm",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -11,15 +11,22 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.20.8",
-    "@charcoal-ui/icons": "^2.6.0",
+    "@charcoal-ui/icons": "^2.10.0",
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
     "@google-cloud/text-to-speech": "^5.0.1",
     "@google/generative-ai": "^0.12.0",
+    "@mui/icons-material": "^5.15.20",
+    "@mui/material": "^5.15.20",
     "@pixiv/three-vrm": "^2.1.2",
     "@tailwindcss/line-clamp": "^0.4.4",
     "@types/dom-speech-recognition": "^0.0.1",
     "axios": "^1.6.8",
+    "cors": "^2.8.5",
     "eslint": "8.36.0",
     "eslint-config-next": "13.2.4",
+    "firebase": "^10.12.2",
+    "firebase-functions": "^5.0.1",
     "groq-sdk": "^0.3.3",
     "i18next": "^23.11.5",
     "next": "^13.5.6",
@@ -44,6 +51,6 @@
     "tailwindcss": "^3.3.1"
   },
   "engines": {
-    "node": ">=16.14.2"
+    "node": "20"
   }
 }

@@ -9,6 +9,8 @@ import { ViewerContext } from "@/features/vrmViewer/viewerContext";
 import { AssistantText } from "./assistantText";
 import { useTranslation } from 'react-i18next';
 import { testVoice } from "@/features/messages/speakCharacter";
+import { getAuth, signOut } from "firebase/auth"; // Firebaseのログアウト機能をインポート
+import LogoutIcon from '@mui/icons-material/Logout'; // ログアウトアイコンをインポート
 
 type Props = {
   selectAIService: string;
@@ -381,6 +383,17 @@ export const Menu = ({
     [onChangeGSVITtsSpeechRate]
   );
 
+  const handleLogout = useCallback(() => {
+    const auth = getAuth();
+    signOut(auth).then(() => {
+      // ログアウト成功時の処理（例：ログインページにリダイレクト）
+      window.location.href = "/login";
+    }).catch((error) => {
+      // エラーハンドリング
+      console.error("Logout error:", error);
+    });
+  }, []);
+
   return (
     <>
       <div className="absolute z-10 m-24">
@@ -406,6 +419,13 @@ export const Menu = ({
               onClick={() => setShowChatLog(true)}
             />
           )}
+          <IconButton
+            iconName="24/Logout"
+            customIcon={<LogoutIcon />} // LogoutIconを使用
+            isProcessing={false}
+            onClick={handleLogout} // ログアウト関数を呼び出す
+            label={t('Logout')}
+          />
         </div>
       </div>
       {

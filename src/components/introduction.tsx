@@ -18,10 +18,12 @@ export const Introduction = ({
   setSelectLanguage,
   setSelectVoiceLanguage
 }: Props) => {
-  const [opened, setOpened] = useState(true);
+  const [opened, setOpened] = useState(false);
+  console.log('コンポーネントがマウントされ、初期状態が設定されました。opened:', opened);
 
   const handleDontShowIntroductionChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
+      console.log('dontShowIntroductionの変更イベントが発生しました。', event.target.checked);
       onChangeDontShowIntroduction(event.target.checked);
       updateLanguage();
     },
@@ -31,15 +33,18 @@ export const Introduction = ({
   const { t } = useTranslation();
 
   const updateLanguage = () => {
-    console.log('i18n.language', i18n.language);
-    // selectLanguage: "JP"
+    console.log('現在のi18n.language:', i18n.language);
     let languageCode = i18n.language.toUpperCase();
-    languageCode == "JA" ? "JP" : languageCode
+    if (languageCode === "JA") {
+      languageCode = "JP";
+    }
+    console.log('言語コードを更新:', languageCode);
     setSelectLanguage(languageCode);
     setSelectVoiceLanguage(getVoiceLanguageCode(languageCode));
   }
 
   const getVoiceLanguageCode = (selectLanguage: string) => {
+    console.log('getVoiceLanguageCodeが呼ばれました。selectLanguage:', selectLanguage);
     switch (selectLanguage) {
       case 'JP':
         return 'ja-JP';
@@ -61,6 +66,7 @@ export const Introduction = ({
           iconName="24/Close"
           isProcessing={false}
           onClick={() => {
+            console.log('閉じるボタンがクリックされました。');
             setOpened(false);
             updateLanguage();
           }}
@@ -137,6 +143,7 @@ export const Introduction = ({
         <div className="my-24">
           <button
             onClick={() => {
+              console.log('閉じるボタンが再度クリックされました。');
               setOpened(false);
               updateLanguage();
             }}

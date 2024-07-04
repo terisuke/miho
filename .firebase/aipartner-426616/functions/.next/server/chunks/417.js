@@ -1,0 +1,3 @@
+"use strict";exports.id=417,exports.ids=[417],exports.modules={5417:(e,s,t)=>{t.d(s,{h:()=>IconButton});var r=t(997),i=t(3674),o=t.n(i);let IconButton=({iconName:e,isProcessing:s,label:t,customIcon:i,...n})=>(0,r.jsxs)("button",{...n,className:`bg-primary hover:bg-primary-hover active:bg-primary-press disabled:bg-primary-disabled text-white rounded-16 text-sm p-8 text-center inline-flex items-center mr-2
+        ${n.className}
+      `,children:[s?(0,r.jsx)(o(),{size:24,color:"inherit"}):i||(0,r.jsx)("pixiv-icon",{name:e,scale:"1"}),t&&(0,r.jsx)("div",{className:"mx-4 font-bold",children:t})]});IconButton.defaultProps={iconName:"24/Close"}}};

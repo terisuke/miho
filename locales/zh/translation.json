@@ -82,5 +82,11 @@
   "GSVITTSServerUrl": "語音推理端點URL",
   "GSVITTSModelID": "GSVI TTS 模型ID",
   "GSVITTSBatchSize": "GSVI TTS 批次大小 (1 ~ 100 數值越大推理速度越快，太大可能會用完記憶體)",
-  "GSVITTSSpeechRate": "語速 (0.5 ~ 2.0 數字越大越快)"
+  "GSVITTSSpeechRate": "語速 (0.5 ~ 2.0 數字越大越快)",
+  "Email": "電子郵件",
+  "Password": "密碼",
+  "Login with Google": "使用 Google 登入",
+  "Don't have an account?": "還沒有帳號？",
+  "Sign Up": "註冊",
+  "Already have an account?": "已經有帳號？"
 }

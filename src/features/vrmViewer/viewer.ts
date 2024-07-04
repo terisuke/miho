@@ -49,8 +49,8 @@ export class Viewer {
     this.model.loadVRM(url).then(async () => {
       if (!this.model?.vrm) return;
 
-      // Disable frustum culling
-      this.model.vrm.scene.traverse((obj) => {
+      // フラスタムカリングを無効にする
+      this.model.vrm.scene.traverse((obj: THREE.Object3D) => {
         obj.frustumCulled = false;
       });
 
