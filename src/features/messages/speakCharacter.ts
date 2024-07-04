@@ -32,6 +32,7 @@ const createSpeakCharacter = () => {
     onComplete?: () => void
   ) => {
     onStart?.();
+    console.log("speakCharacter function called");
 
     const fetchPromise = prevFetchPromise.then(async () => {
       const now = Date.now();
@@ -39,6 +40,7 @@ const createSpeakCharacter = () => {
         await wait(1000 - (now - lastTime));
       }
       let buffer;
+      console.log("selectVoice:", selectVoice);
       if (selectVoice == "koeiromap") {
         buffer = await fetchAudio(screenplay.talk, koeiroApiKey).catch(
           () => null

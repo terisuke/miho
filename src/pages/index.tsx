@@ -23,14 +23,16 @@ import "@/lib/i18n";
 import { useTranslation } from 'react-i18next';
 import { fetchAndProcessComments } from "@/features/youtube/youtubeComments";
 import { buildUrl } from "@/utils/buildUrl";
-import { saveChatLog } from "@/services/chatService"; // 追加
+import { saveChatLog } from "@/services/chatService";
 import { getAuth } from "firebase/auth";
+import usePreviousRoute from '@/components/usePreviousRoute';
 
 export default function Home() {
   const { viewer } = useContext(ViewerContext);
   
   // userId の宣言を useEffect の上に移動
   const [userId, setUserId] = useState<string | null>(null); // ユーザーIDを管理する状態
+  const previousRoute = usePreviousRoute(); // カスタムフックの使用
 
   const [userName, setUserName] = useState("きみ");
   const [systemPrompt, setSystemPrompt] = useState(() => SYSTEM_PROMPT("きみ"));
@@ -68,7 +70,7 @@ export default function Home() {
   const [backgroundImageUrl, setBackgroundImageUrl] = useState(
     process.env.NEXT_PUBLIC_BACKGROUND_IMAGE_PATH !== undefined ? process.env.NEXT_PUBLIC_BACKGROUND_IMAGE_PATH : "/bg-c.png"
   );
-  const [dontShowIntroduction, setDontShowIntroduction] = useState(false);
+  const [dontShowIntroduction, setDontShowIntroduction] = useState<boolean>(false);
   const [gsviTtsServerUrl, setGSVITTSServerUrl] = useState(process.env.NEXT_PUBLIC_LOCAL_TTS_URL && process.env.NEXT_PUBLIC_LOCAL_TTS_URL !== "" ? process.env.NEXT_PUBLIC_LOCAL_TTS_URL : "http://127.0.0.1:5000/tts");
   const [gsviTtsModelId, setGSVITTSModelID] = useState("");
   const [gsviTtsBatchSize, setGSVITTSBatchSize] = useState(2);
@@ -118,7 +120,7 @@ export default function Home() {
       setStylebertvits2ServerURL(params.stylebertvits2ServerUrl || "http://127.0.0.1:5000");
       setStylebertvits2ModelId(params.stylebertvits2ModelId || "0");
       setStylebertvits2Style(params.stylebertvits2Style || "Neutral");
-      setDontShowIntroduction(params.dontShowIntroduction || true);
+      setDontShowIntroduction(false);
       setGSVITTSServerUrl(params.gsviTtsServerUrl || "http://127.0.0.1:5000/tts");
       setGSVITTSModelID(params.gsviTtsModelId || "");
       setGSVITTSBatchSize(params.gsviTtsBatchSize || 2);
@@ -511,20 +513,27 @@ export default function Home() {
     emotion: string;
   }
   const [tmpMessages, setTmpMessages] = useState<tmpMessage[]>([]);
-
-  useEffect(() => {
+//ログインページを経由するとファーストコメントを出力
+  const handleIntroductionClosed = useCallback(() => {
     const auth = getAuth();
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
         setUserId(user.uid);
-        handleSendChat("「こんにちわ、私美穂！あなたの名前は？「」で囲んで教えてね♪」のように挨拶をした上で、自然に「」内にユーザーのなめを取得できる質問をしてください", "assistant");// ユーザーIDを設定
+        if (previousRoute === "/login") {
+          console.log("User logged in via login page, sending first chat message");
+          handleSendChat("「こんにちわ、私美穂！あなたの名前は何ていうの？「〜だよ」って言う形で教えてね♪」という内容をそのまま出力してください", "assistant");
+        } else {
+          console.log("User logged in directly, sending welcome back message");
+          handleSendChat("「おかえり、また来てくれてありがとう」と言う内容をそのまま出力してください。"
+          , "assistant");
+        }
       } else {
         setUserId(null);
       }
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [previousRoute]);
 
 
   useEffect(() => {
@@ -653,6 +662,7 @@ export default function Home() {
             selectLanguage={selectLanguage}
             setSelectLanguage={setSelectLanguage}
             setSelectVoiceLanguage={setSelectVoiceLanguage}
+            onIntroductionClosed={handleIntroductionClosed}
           />
         )}
         <VrmViewer />
