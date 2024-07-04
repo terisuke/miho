@@ -9,18 +9,24 @@ import { ViewerContext } from "@/features/vrmViewer/viewerContext";
 import { AssistantText } from "./assistantText";
 import { useTranslation } from 'react-i18next';
 import { testVoice } from "@/features/messages/speakCharacter";
+import { getAuth, signOut } from "firebase/auth"; // Firebaseのログアウト機能をインポート
+import LogoutIcon from '@mui/icons-material/Logout'; // ログアウトアイコンをインポート
 
 type Props = {
   selectAIService: string;
-  setSelectAIService: (service: string) => void;
+  onChangeAIService: (service: string) => void;
   selectAIModel: string;
   setSelectAIModel: (model: string) => void;
   openAiKey: string;
   onChangeOpenAiKey: (key: string) => void;
   anthropicKey: string;
   onChangeAnthropicKey: (key: string) => void;
+  googleKey: string;
+  onChangeGoogleKey: (key: string) => void;
   groqKey: string;
   onChangeGroqKey: (key: string) => void;
+  localLlmUrl: string;
+  onChangeLocalLlmUrl: (url: string) => void;
   difyKey: string;
   onChangeDifyKey: (key: string) => void;
   difyUrl: string;
@@ -42,6 +48,7 @@ type Props = {
   youtubeMode: boolean;
   youtubeApiKey: string;
   youtubeLiveId: string;
+  conversationContinuityMode: boolean;
   onChangeSystemPrompt: (systemPrompt: string) => void;
   onChangeChatLog: (index: number, text: string) => void;
   onChangeCodeLog: (index: number, text: string) => void;
@@ -55,6 +62,7 @@ type Props = {
   onChangeYoutubeMode: (mode: boolean) => void;
   onChangeYoutubeApiKey: (key: string) => void;
   onChangeYoutubeLiveId: (key: string) => void;
+  onChangeConversationContinuityMode: (mode: boolean) => void;
   webSocketMode: boolean;
   changeWebSocketMode: (show: boolean) => void;
   selectVoice: string;
@@ -62,18 +70,37 @@ type Props = {
   selectLanguage: string;
   setSelectLanguage: (show: string) => void;
   setSelectVoiceLanguage: (show: string) => void;
+  setBackgroundImageUrl: (url: string) => void;
+  gsviTtsServerUrl: string;
+  onChangeGSVITtsServerUrl: (name: string) => void;
+  gsviTtsModelId: string;
+  onChangeGSVITtsModelId: (name: string) => void;
+  gsviTtsBatchSize: number;
+  onChangeGVITtsBatchSize: (speed: number) => void;
+  gsviTtsSpeechRate: number;
+  onChangeGSVITtsSpeechRate: (speed: number) => void;
+  userName: string;
+  setUserName: (name: string) => void;
+  setSystemPrompt: (prompt: string) => void;
 };
+
 export const Menu = ({
   selectAIService,
-  setSelectAIService,
+  onChangeAIService,
   selectAIModel,
   setSelectAIModel,
+  userName,
+  setUserName,
   openAiKey,
   onChangeOpenAiKey,
   anthropicKey,
   onChangeAnthropicKey,
+  googleKey,
+  onChangeGoogleKey,
   groqKey,
   onChangeGroqKey,
+  localLlmUrl,
+  onChangeLocalLlmUrl,
   difyKey,
   onChangeDifyKey,
   difyUrl,
@@ -92,6 +119,7 @@ export const Menu = ({
   youtubeMode,
   youtubeApiKey,
   youtubeLiveId,
+  conversationContinuityMode,
   onChangeSystemPrompt,
   onChangeChatLog,
   onChangeCodeLog,
@@ -108,6 +136,7 @@ export const Menu = ({
   onChangeYoutubeMode,
   onChangeYoutubeApiKey,
   onChangeYoutubeLiveId,
+  onChangeConversationContinuityMode,
   webSocketMode,
   changeWebSocketMode,
   selectVoice,
@@ -115,12 +144,33 @@ export const Menu = ({
   selectLanguage,
   setSelectLanguage,
   setSelectVoiceLanguage,
+  setBackgroundImageUrl,
+  gsviTtsServerUrl,
+  onChangeGSVITtsServerUrl,
+  gsviTtsModelId,
+  onChangeGSVITtsModelId,
+  gsviTtsBatchSize,
+  onChangeGVITtsBatchSize,
+  gsviTtsSpeechRate,
+  onChangeGSVITtsSpeechRate,
+  setSystemPrompt,
 }: Props) => {
   const [showSettings, setShowSettings] = useState(false);
   const [showChatLog, setShowChatLog] = useState(false);
   const { viewer } = useContext(ViewerContext);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const bgFileInputRef = useRef<HTMLInputElement>(null);
   const { t } = useTranslation();
+
+  const handleChangeAIService = useCallback(
+    (event: React.ChangeEvent<HTMLSelectElement>) => {
+      onChangeAIService(event.target.value);
+      if (event.target.value !== "openai") {
+        onChangeConversationContinuityMode(false);
+      }
+    },
+    [onChangeAIService, onChangeConversationContinuityMode]
+  );
 
   const handleChangeSystemPrompt = useCallback(
     (event: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -143,11 +193,25 @@ export const Menu = ({
     [onChangeAnthropicKey]
   );
 
+  const handleGoogleKeyChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      onChangeGoogleKey(event.target.value);
+    },
+    [onChangeGoogleKey]
+  );
+
   const handleGroqKeyChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       onChangeGroqKey(event.target.value);
     },
     [onChangeGroqKey]
+  );
+
+  const handleChangeLocalLlmUrl = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      onChangeLocalLlmUrl(event.target.value);
+    },
+    [onChangeLocalLlmUrl]
   );
 
   const handleDifyKeyChange = useCallback(
@@ -239,8 +303,20 @@ export const Menu = ({
     },
     [changeWebSocketMode, webSocketMode, onChangeYoutubeMode]
   );
+
+  const handleConversationContinuityMode = useCallback(
+    (show: boolean) => {
+      onChangeConversationContinuityMode(show);
+    },
+    [onChangeConversationContinuityMode]
+  );
+
   const handleClickOpenVrmFile = useCallback(() => {
     fileInputRef.current?.click();
+  }, []);
+
+  const handleClickOpenBgFile = useCallback(() => {
+    bgFileInputRef.current?.click();
   }, []);
 
   const handleClickTestVoice = (speaker: string) => {
@@ -268,6 +344,56 @@ export const Menu = ({
     [viewer]
   );
 
+  const handleChangeBgFile = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      if (file) {
+        const imageUrl = URL.createObjectURL(file);
+        setBackgroundImageUrl(imageUrl);
+      }
+    },
+    [setBackgroundImageUrl]
+  );
+
+  const handleChangeGSVITtsServerUrl = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      onChangeGSVITtsServerUrl(event.target.value);
+    },
+    [onChangeGSVITtsServerUrl]
+  );
+
+  const handleChangeGSVITtsModelId = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      onChangeGSVITtsModelId(event.target.value);
+    },
+    [onChangeGSVITtsModelId]
+  );
+
+  const handleChangeGSVITtsBatchSize = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      onChangeGVITtsBatchSize(parseFloat(event.target.value));
+    },
+    [onChangeGVITtsBatchSize]
+  );
+
+  const handleChangeGSVITtsSpeechRate = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      onChangeGSVITtsSpeechRate(parseFloat(event.target.value));
+    },
+    [onChangeGSVITtsSpeechRate]
+  );
+
+  const handleLogout = useCallback(() => {
+    const auth = getAuth();
+    signOut(auth).then(() => {
+      // ログアウト成功時の処理（例：ログインページにリダイレクト）
+      window.location.href = "/login";
+    }).catch((error) => {
+      // エラーハンドリング
+      console.error("Logout error:", error);
+    });
+  }, []);
+
   return (
     <>
       <div className="absolute z-10 m-24">
@@ -293,6 +419,13 @@ export const Menu = ({
               onClick={() => setShowChatLog(true)}
             />
           )}
+          <IconButton
+            iconName="24/Logout"
+            customIcon={<LogoutIcon />} // LogoutIconを使用
+            isProcessing={false}
+            onClick={handleLogout} // ログアウト関数を呼び出す
+            label={t('Logout')}
+          />
         </div>
       </div>
       {
@@ -303,17 +436,24 @@ export const Menu = ({
       {showSettings && (
         <Settings
           selectAIService={selectAIService}
-          setSelectAIService={setSelectAIService}
+          onChangeAIService={handleChangeAIService}
           selectAIModel={selectAIModel}
           setSelectAIModel={setSelectAIModel}
+          userName={userName}
+          setUserName={setUserName}
+          setSystemPrompt={setSystemPrompt}
           openAiKey={openAiKey}
           onChangeOpenAiKey={handleOpenAiKeyChange}
           anthropicKey={anthropicKey}
           onChangeAnthropicKey={handleAnthropicKeyChange}
+          googleKey={googleKey}
+          onChangeGoogleKey={handleGoogleKeyChange}
           groqKey={groqKey}
           onChangeGroqKey={handleGroqKeyChange}
           difyKey={difyKey}
           onChangeDifyKey={handleDifyKeyChange}
+          localLlmUrl={localLlmUrl}
+          onChangeLocalLlmUrl={handleChangeLocalLlmUrl}
           difyUrl={difyUrl}
           onChangeDifyUrl={handleDifyUrlChange}
           chatLog={chatLog}
@@ -329,12 +469,14 @@ export const Menu = ({
           youtubeMode={youtubeMode}
           youtubeApiKey={youtubeApiKey}
           youtubeLiveId={youtubeLiveId}
+          conversationContinuityMode={conversationContinuityMode}
           onClickClose={() => setShowSettings(false)}
           onChangeSystemPrompt={handleChangeSystemPrompt}
           onChangeChatLog={onChangeChatLog}
           onChangeCodeLog={onChangeCodeLog}
           onChangeKoeiroParam={handleChangeKoeiroParam}
           onClickOpenVrmFile={handleClickOpenVrmFile}
+          onClickOpenBgFile={handleClickOpenBgFile}
           onClickResetChatLog={handleClickResetChatLog}
           onClickResetCodeLog={handleClickResetCodeLog}
           onClickResetSystemPrompt={handleClickResetSystemPrompt}
@@ -347,6 +489,7 @@ export const Menu = ({
           onChangeYoutubeMode={onChangeYoutubeMode}
           onChangeYoutubeApiKey={handleYoutubeApiKeyChange}
           onChangeYoutubeLiveId={handleYoutubeLiveIdChange}
+          onChangeConversationContinuityMode={handleConversationContinuityMode}
           webSocketMode={webSocketMode}
           onChangeWebSocketMode={handleWebSocketMode}
           selectVoice = {selectVoice}
@@ -355,6 +498,14 @@ export const Menu = ({
           setSelectLanguage = {setSelectLanguage}
           setSelectVoiceLanguage = {setSelectVoiceLanguage}
           onClickTestVoice={handleClickTestVoice}
+          gsviTtsServerUrl={gsviTtsServerUrl}
+          onChangeGSVITtsServerUrl={handleChangeGSVITtsServerUrl}
+          gsviTtsModelId={gsviTtsModelId}
+          onChangeGSVITtsModelId={handleChangeGSVITtsModelId}
+          gsviTtsBatchSize={gsviTtsBatchSize}
+          onChangeGVITtsBatchSize={handleChangeGSVITtsBatchSize}
+          gsviTtsSpeechRate={gsviTtsSpeechRate}
+          onChangeGSVITtsSpeechRate={handleChangeGSVITtsSpeechRate}
         />
       )}
       {!showChatLog && assistantMessage && (
@@ -366,6 +517,13 @@ export const Menu = ({
         accept=".vrm"
         ref={fileInputRef}
         onChange={handleChangeVrmFile}
+      />
+      <input
+        type="file"
+        className="hidden"
+        accept="image/*"
+        ref={bgFileInputRef}
+        onChange={handleChangeBgFile}
       />
     </>
   );

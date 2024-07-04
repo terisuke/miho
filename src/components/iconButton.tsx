@@ -1,15 +1,19 @@
+import { ButtonHTMLAttributes, ReactNode } from "react";
 import { KnownIconType } from "@charcoal-ui/icons";
-import { ButtonHTMLAttributes } from "react";
+import { CircularProgress } from '@mui/material';
+
 type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
   iconName: keyof KnownIconType;
   isProcessing: boolean;
   label?: string;
+  customIcon?: ReactNode;
 };
 
 export const IconButton = ({
   iconName,
   isProcessing,
   label,
+  customIcon,
   ...rest
 }: Props) => {
   return (
@@ -20,11 +24,17 @@ export const IconButton = ({
       `}
     >
       {isProcessing ? (
-        <pixiv-icon name={"24/Dot"} scale="1"></pixiv-icon>
+        <CircularProgress size={24} color="inherit" />
+      ) : customIcon ? (
+        customIcon
       ) : (
         <pixiv-icon name={iconName} scale="1"></pixiv-icon>
       )}
       {label && <div className="mx-4 font-bold">{label}</div>}
     </button>
   );
+};
+
+IconButton.defaultProps = {
+  iconName: "24/Close", // ここでデフォルトのアイコン名を指定
 };

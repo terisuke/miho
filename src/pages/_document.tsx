@@ -1,4 +1,3 @@
-import { buildUrl } from "@/utils/buildUrl";
 import { Html, Head, Main, NextScript } from "next/document";
 
 export default function Document() {
@@ -15,8 +14,9 @@ export default function Document() {
           href="https://fonts.googleapis.com/css2?family=M+PLUS+2&family=Montserrat&display=swap"
           rel="stylesheet"
         />
+        <link rel="icon" href="/penguin.svg" type="image/svg+xml" />
       </Head>
-      <body style={{ backgroundImage: `url(${buildUrl("/bg-c.png")})` }}>
+      <body>
         <Main />
         <NextScript />
       </body>

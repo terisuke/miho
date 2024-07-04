@@ -27,11 +27,11 @@ export class Viewer {
     this._scene = scene;
 
     // light
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 2);
     directionalLight.position.set(1.0, 1.0, 1.0).normalize();
     scene.add(directionalLight);
 
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1);
     scene.add(ambientLight);
 
     // animate
@@ -49,8 +49,8 @@ export class Viewer {
     this.model.loadVRM(url).then(async () => {
       if (!this.model?.vrm) return;
 
-      // Disable frustum culling
-      this.model.vrm.scene.traverse((obj) => {
+      // フラスタムカリングを無効にする
+      this.model.vrm.scene.traverse((obj: THREE.Object3D) => {
         obj.frustumCulled = false;
       });
 
@@ -86,7 +86,6 @@ export class Viewer {
       alpha: true,
       antialias: true,
     });
-    this._renderer.outputEncoding = THREE.sRGBEncoding;
     this._renderer.setSize(width, height);
     this._renderer.setPixelRatio(window.devicePixelRatio);
 

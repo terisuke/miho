@@ -34,7 +34,11 @@ export type Screenplay = {
   expression: EmotionType;
   talk: Talk;
 };
-
+///。や・・・で連続した感情表現としてまとめて出力する
+///useeffect?
+//文章のlengthを伸ばす
+//マークダウンと箇条書きの出力方法(UI)
+//英語版に対応させる
 export const splitSentence = (text: string): string[] => {
   const splitMessages = text.split(/(?<=[。．！？\n])/g);
   return splitMessages.filter((msg) => msg !== "");

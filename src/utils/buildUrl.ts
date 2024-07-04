@@ -11,5 +11,5 @@ export function buildUrl(path: string): string {
     publicRuntimeConfig: { root: string };
   } = getConfig();
 
-  return publicRuntimeConfig.root + path;
+  return `${publicRuntimeConfig.root}${path}`;
 }

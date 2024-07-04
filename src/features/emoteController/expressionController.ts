@@ -22,6 +22,7 @@ export class ExpressionController {
     preset: VRMExpressionPresetName;
     value: number;
   } | null;
+
   constructor(vrm: VRM, camera: THREE.Object3D) {
     this._autoLookAt = new AutoLookAt(vrm, camera);
     this._currentEmotion = "neutral";
@@ -45,9 +46,34 @@ export class ExpressionController {
 
     const t = this._autoBlink?.setEnable(false) || 0;
     this._currentEmotion = preset;
+
+    // 目を開ける
+    this._expressionManager?.setValue(VRMExpressionPresetName.Blink, 0);
+
+    // 表情をセット
+    this._expressionManager?.setValue(preset, 1);
+
+    // 表情保持時間を取得し、保持後に neutral に戻す
+    const delayTime = this.getDelayTime(preset) * 1000;
     setTimeout(() => {
-      this._expressionManager?.setValue(preset, 1);
-    }, t * 1000);
+      this._expressionManager?.setValue(preset, 0);
+      this._expressionManager?.setValue("neutral", 1);
+      this._currentEmotion = "neutral";
+    }, delayTime);
+  }
+
+  private getDelayTime(preset: VRMExpressionPresetName): number {
+    switch (preset) {
+      case "happy":
+      case "relaxed":
+      case "neutral":
+        return 5; // 中程度の表情は5秒
+      case "angry":
+      case "sad":
+        return 8; // 長い表情は8秒
+      default:
+        return 3; // その他の表情はデフォルトで3秒
+    }
   }
 
   public lipSync(preset: VRMExpressionPresetName, value: number) {
